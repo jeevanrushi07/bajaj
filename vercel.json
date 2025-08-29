@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/bfhl",
+      "dest": "/api/bfhl.js"
+    }
+  ],
+  "functions": {
+    "api/bfhl.js": {
+      "maxDuration": 10
+    }
+  }
+}
