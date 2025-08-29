@@ -1,46 +1,60 @@
 # BFHL REST API
 
-यह एक REST API है जो array input लेता है और विभिन्न प्रकार के data को process करता है।
+A simple REST API that accepts an array of values and returns a structured JSON response with categorized data and derived fields.
 
-## Features
+## Endpoints
 
-- **POST /bfhl** - Main endpoint जो array process करता है
-- **GET /bfhl** - Operation code return करता है
+- `POST /bfhl` – Processes input array and returns results
+- `GET /bfhl` – Returns `{ "operation_code": 1 }` for a quick health/contract check
 
-## API Response Format
+## Input
 
-```json
-{
-  "is_success": true,
-  "user_id": "jeevan_rushi_01062004",
-  "email": "jeevanrushicreations584@gmail.com",
-  "roll_number": "ABCD123",
-  "odd_numbers": ["1", "5"],
-  "even_numbers": ["2", "4", "92"],
-  "alphabets": ["A", "Y", "B"],
-  "special_characters": ["&", "-", "*"],
-  "sum": "103",
-  "concat_string": "ByA"
-}
-```
-
-## Example Usage
-
-### Example 1
-**Request:**
+POST body (JSON):
 ```json
 {
   "data": ["a", "1", "334", "4", "R", "$"]
 }
 ```
 
-**Response:**
+## Response
+On success (`200 OK`):
 ```json
 {
   "is_success": true,
-  "user_id": "jeevan_rushi_01062004",
+  "user_id": "jeevan_rushi_07062004",
   "email": "jeevanrushicreations584@gmail.com",
-  "roll_number": "ABCD123",
+  "roll_number": "22BCE7337",
+  "odd_numbers": ["1"],
+  "even_numbers": ["334", "4"],
+  "alphabets": ["A", "R"],
+  "special_characters": ["$"],
+  "sum": "339",
+  "concat_string": "Ra"
+}
+```
+On error, a proper status code is returned with `{ is_success: false, error: "..." }`.
+
+## Logic
+- **Numbers**: Extracted as strings, summed, and split into `even_numbers` and `odd_numbers`.
+- **Alphabets**: All alphabetical strings converted to uppercase and returned in `alphabets`.
+- **Special Characters**: Single non-alphanumeric symbols captured under `special_characters`.
+- **Sum**: Sum of all numeric entries, returned as a string.
+- **concat_string**: All alphabetical characters from input joined, reversed, and converted to alternating caps (Upper, lower, Upper, ...).
+
+## Examples
+
+### Example A
+Request:
+```json
+{ "data": ["a", "1", "334", "4", "R", "$"] }
+```
+Response (200):
+```json
+{
+  "is_success": true,
+  "user_id": "jeevan_rushi_07062004",
+  "email": "jeevanrushicreations584@gmail.com",
+  "roll_number": "22BCE7337",
   "odd_numbers": ["1"],
   "even_numbers": ["334", "4"],
   "alphabets": ["A", "R"],
@@ -50,21 +64,18 @@
 }
 ```
 
-### Example 2
-**Request:**
+### Example B
+Request:
 ```json
-{
-  "data": ["2", "a", "y", "4", "&", "-", "*", "5", "92", "b"]
-}
+{ "data": ["2", "a", "y", "4", "&", "-", "*", "5", "92", "b"] }
 ```
-
-**Response:**
+Response (200):
 ```json
 {
   "is_success": true,
-  "user_id": "jeevan_rushi_01062004",
+  "user_id": "jeevan_rushi_07062004",
   "email": "jeevanrushicreations584@gmail.com",
-  "roll_number": "ABCD123",
+  "roll_number": "22BCE7337",
   "odd_numbers": ["5"],
   "even_numbers": ["2", "4", "92"],
   "alphabets": ["A", "Y", "B"],
@@ -74,50 +85,54 @@
 }
 ```
 
-## Logic Details
-
-1. **Numbers**: Even और odd numbers को अलग करता है
-2. **Alphabets**: सभी alphabets को uppercase में convert करता है
-3. **Special Characters**: Single character special symbols को identify करता है
-4. **Sum**: सभी numbers का sum calculate करता है
-5. **Concatenation**: सभी alphabets को reverse order में alternating caps के साथ concatenate करता है
-
-## Deployment
-
-### Vercel पर Deploy करने के लिए:
-
-1. Vercel CLI install करें:
-```bash
-npm i -g vercel
+### Example C
+Request:
+```json
+{ "data": ["A", "ABcD", "DOE"] }
+```
+Response (200):
+```json
+{
+  "is_success": true,
+  "user_id": "jeevan_rushi_07062004",
+  "email": "jeevanrushicreations584@gmail.com",
+  "roll_number": "22BCE7337",
+  "odd_numbers": [],
+  "even_numbers": [],
+  "alphabets": ["A", "ABCD", "DOE"],
+  "special_characters": [],
+  "sum": "0",
+  "concat_string": "EoDdCbAa"
+}
 ```
 
-2. Project को deploy करें:
-```bash
-vercel
-```
-
-3. या GitHub से direct deploy करें:
-   - GitHub repository को Vercel से connect करें
-   - Automatic deployment enable करें
-
-## Local Development
-
+## Run Locally
 ```bash
 npm install
-vercel dev
+npm start
+# Server: http://localhost:3000/
+# API:    http://localhost:3000/bfhl
 ```
 
-## Error Handling
+## Deploy
+This project is deployable on Vercel/Railway/Render.
 
-API gracefully handle करता है:
-- Invalid input data
-- Missing data array
-- Internal server errors
-- Method not allowed errors
+- Vercel (recommended):
+  - Connect GitHub repo to Vercel or use CLI.
+  - Using CLI:
+    ```bash
+    npm i -g vercel
+    vercel --prod
+    ```
 
-## Status Codes
+## Testing
+You can use Postman/Hoppscotch or the provided scripts:
+- `node test.js`
+- `node test-postman-data.js`
+- `node test-deployed-api.js`
 
-- **200**: Success
-- **400**: Bad Request (invalid input)
-- **405**: Method Not Allowed
-- **500**: Internal Server Error
+## Error Handling & Status Codes
+- 200: Success
+- 400: Bad Request (invalid input)
+- 405: Method Not Allowed
+- 500: Internal Server Error
